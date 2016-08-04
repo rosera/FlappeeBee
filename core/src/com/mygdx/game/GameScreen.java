@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -48,6 +50,17 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+    private void update(float delta) {
+        mFlappee.update();
+
+        // Check whether the user needs to fly up
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
+            mFlappee.flyUp();
+
+        // Add world constraints
+        blockFlappeeLevingTheWorld();
+    }
+
     @Override
     public void render(float delta) {
 //        super.render(delta);
@@ -67,5 +80,15 @@ public class GameScreen extends ScreenAdapter {
         mShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         mFlappee.drawDebug(mShapeRenderer);
         mShapeRenderer.end();
+
+        // Update the flappee bee object
+        update(delta);
     }
+
+
+    private void blockFlappeeLevingTheWorld() {
+        mFlappee.setPosition(mFlappee.getX(),
+                MathUtils.clamp(mFlappee.getY(), 0, WORLD_HEIGHT));
+    }
+
 }
