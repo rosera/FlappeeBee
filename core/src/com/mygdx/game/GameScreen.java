@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -20,13 +21,14 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameScreen extends ScreenAdapter {
     private static final float WORLD_WIDTH = 480;
     private static final float WORLD_HEIGHT = 640;
+    private static final float GAP_BETWEEN_FLOWERS = 200f;
 
     private ShapeRenderer   mShapeRenderer;
     private Viewport        mViewport;
     private Camera          mCamera;
     private SpriteBatch     mSpriteBatch;
     private Flappee         mFlappee;
-    private Flower          mFlower;
+    private Array<Flower>   mFlowers;
 
     @Override
     public void show() {
@@ -44,9 +46,8 @@ public class GameScreen extends ScreenAdapter {
         mFlappee = new Flappee();
         mFlappee.setPosition(WORLD_WIDTH / 4, WORLD_HEIGHT / 2);
 
-        // Initialise the Flow object
-        mFlower = new Flower();
-        mFlower.setPosition(0f);
+        // Initialise the Flower object
+        mFlowers = new Array<Flower>();
     }
 
     // Clear the screen
@@ -66,6 +67,8 @@ public class GameScreen extends ScreenAdapter {
 
         // Add world constraints
         blockFlappeeLevingTheWorld();
+
+        updateFlowers(delta);
     }
 
     // Output the screen
@@ -87,11 +90,17 @@ public class GameScreen extends ScreenAdapter {
 
         mShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         mFlappee.drawDebug(mShapeRenderer);
-        mFlower.drawDebug(mShapeRenderer);
-        mShapeRenderer.end();
 
         // Update the flappee bee object
         update(delta);
+
+        // Update the Flowers
+        for (Flower flower: mFlowers) {
+            flower.drawDebug(mShapeRenderer);
+        }
+
+        mShapeRenderer.end();
+
     }
 
 
@@ -99,6 +108,43 @@ public class GameScreen extends ScreenAdapter {
     private void blockFlappeeLevingTheWorld() {
         mFlappee.setPosition(mFlappee.getX(),
                 MathUtils.clamp(mFlappee.getY(), 0, WORLD_HEIGHT));
+    }
+
+
+    // Create onscreen flowers
+    private void createNewFlower() {
+        Flower newFlower = new Flower();
+        newFlower.setPosition((WORLD_WIDTH + Flower.WIDTH));
+        mFlowers.add(newFlower);
+    }
+
+    private void checkIfNewFlowerIsNeeded() {
+        if (mFlowers.size == 0) {
+            createNewFlower();
+        } else {
+            Flower flower = mFlowers.peek();
+            if (flower.getX() < WORLD_WIDTH - GAP_BETWEEN_FLOWERS) {
+                createNewFlower();
+            }
+        }
+    }
+
+    private void removeFlowersIfPassed() {
+        if (mFlowers.size > 0) {
+            Flower firstFlower = mFlowers.first();
+            if (firstFlower.getX() < -Flower.WIDTH) {
+                mFlowers.removeValue(firstFlower, true);
+            }
+        }
+    }
+
+    private void updateFlowers(float delta) {
+        for (Flower flower: mFlowers) {
+            flower.update(delta);
+        }
+
+        checkIfNewFlowerIsNeeded();
+        removeFlowersIfPassed();
     }
 
 }
