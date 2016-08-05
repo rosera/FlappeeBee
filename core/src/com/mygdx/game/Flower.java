@@ -28,6 +28,8 @@ public class Flower {
     private float x = 0;
     private float y = 0;
 
+    private boolean mPointClaimed = false;
+
     public Flower() {
         // Make the Flowers a random height
         this.y = MathUtils.random(HEIGHT_OFFSET);
@@ -105,4 +107,13 @@ public class Flower {
                 Intersector.overlaps(flappeeCollisionCircle, mCeilingCollisionRectangle) ||
                 Intersector.overlaps(flappeeCollisionCircle, mFloorCollisionRectangle);
     }
+
+    public boolean isPointClaimed() {
+        return mPointClaimed;
+    }
+
+    public void markPointClaimed() {
+        mPointClaimed = true;
+    }
+
 }

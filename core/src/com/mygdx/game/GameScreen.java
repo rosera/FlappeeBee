@@ -3,10 +3,12 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
 
 /**
  * Created by rosera on 04/08/16.
@@ -31,6 +34,9 @@ public class GameScreen extends ScreenAdapter {
     private Array<Flower>   mFlowers;
 
     private int mScore = 0;
+
+    private BitmapFont      mBitmapFont;
+    private GlyphLayout     mGlyphLayout;
 
     @Override
     public void show() {
@@ -50,6 +56,12 @@ public class GameScreen extends ScreenAdapter {
 
         // Initialise the Flower object
         mFlowers = new Array<Flower>();
+
+        // Add onscreen score
+        mBitmapFont = new BitmapFont();
+        mBitmapFont.setColor(Color.WHITE);
+
+        mGlyphLayout = new GlyphLayout();
     }
 
     // Clear the screen
@@ -80,6 +92,8 @@ public class GameScreen extends ScreenAdapter {
 
         updateFlowers(delta);
 
+        updateScore();
+
         // Check for a collision
         if (checkForCollision()) {
             restart();
@@ -93,15 +107,20 @@ public class GameScreen extends ScreenAdapter {
 
         clearScreen();
 
-        mSpriteBatch.setProjectionMatrix(mCamera.projection);
-        mSpriteBatch.setTransformMatrix(mCamera.view);
-        mSpriteBatch.begin();
+//        mSpriteBatch.setProjectionMatrix(mCamera.projection);
+//        mSpriteBatch.setTransformMatrix(mCamera.view);
 
-        mSpriteBatch.end();
 
 //        // Draw Flappee
 //        mShapeRenderer.setProjectionMatrix(mCamera.projection);
 //        mShapeRenderer.setTransformMatrix(mCamera.view);
+
+        // Output on screen text
+//        mSpriteBatch.begin();
+
+        draw();
+
+//        mSpriteBatch.end();
 
         mShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         mFlappee.drawDebug(mShapeRenderer);
@@ -115,6 +134,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         mShapeRenderer.end();
+
 
     }
 
@@ -169,6 +189,37 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         return false;
+    }
+
+
+    // Add on screen score
+    private void updateScore() {
+        Flower flower = mFlowers.first();
+
+        if (flower.getX() < mFlappee.getX() && !flower.isPointClaimed()) {
+            flower.markPointClaimed();
+            mScore ++;
+        }
+    }
+
+    private void drawScore() {
+        String scoreAsString = Integer.toString(mScore);
+        mGlyphLayout.setText(mBitmapFont, scoreAsString);
+
+        // Output text
+        mBitmapFont.draw(mSpriteBatch, "FlappeeBee Score:",
+                10f, 25f);
+
+        // Output the Score
+        mBitmapFont.draw(mSpriteBatch, scoreAsString,
+            140f,
+            25f);
+    }
+
+    private void draw() {
+        mSpriteBatch.begin();
+        drawScore();
+        mSpriteBatch.end();
     }
 
 }
