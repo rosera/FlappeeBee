@@ -41,6 +41,10 @@ public class Flappee {
         updateCollisionCircle();
     }
 
+    public Circle getCollisionCircle() {
+        return mCollisionCircle;
+    }
+
     public void update() {
         mYAxisSpeed -= DIVE_ACCEL;
         setPosition(x, y + mYAxisSpeed);

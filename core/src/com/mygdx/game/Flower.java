@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -93,5 +94,15 @@ public class Flower {
 
     public float getX() {
         return this.x;
+    }
+
+    // Add collision detection
+    public boolean isFlappeeColliding(Flappee flappee) {
+        Circle flappeeCollisionCircle = flappee.getCollisionCircle();
+
+        return  Intersector.overlaps(flappeeCollisionCircle, mCeilingCollisionCircle) ||
+                Intersector.overlaps(flappeeCollisionCircle, mFloorCollisionCircle) ||
+                Intersector.overlaps(flappeeCollisionCircle, mCeilingCollisionRectangle) ||
+                Intersector.overlaps(flappeeCollisionCircle, mFloorCollisionRectangle);
     }
 }

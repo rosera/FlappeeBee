@@ -30,6 +30,8 @@ public class GameScreen extends ScreenAdapter {
     private Flappee         mFlappee;
     private Array<Flower>   mFlowers;
 
+    private int mScore = 0;
+
     @Override
     public void show() {
         super.show();
@@ -57,6 +59,14 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+    private void restart() {
+        mFlappee.setPosition(WORLD_WIDTH / 4, WORLD_WIDTH / 2);
+        mFlowers.clear();
+
+        // Reset the score
+        mScore = 0;
+    }
+
     // Update the for each screen cycle
     private void update(float delta) {
         mFlappee.update();
@@ -69,6 +79,11 @@ public class GameScreen extends ScreenAdapter {
         blockFlappeeLevingTheWorld();
 
         updateFlowers(delta);
+
+        // Check for a collision
+        if (checkForCollision()) {
+            restart();
+        }
     }
 
     // Output the screen
@@ -145,6 +160,15 @@ public class GameScreen extends ScreenAdapter {
 
         checkIfNewFlowerIsNeeded();
         removeFlowersIfPassed();
+    }
+
+    private boolean checkForCollision() {
+        for (Flower flower: mFlowers) {
+            if (flower.isFlappeeColliding(mFlappee)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
