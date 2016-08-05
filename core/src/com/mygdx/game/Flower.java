@@ -15,27 +15,39 @@ public class Flower {
     private static final float MAX_SPEED_PER_SECOND = 100f;
     private static final float HEIGHT_OFFSET = -400f;
 
+    private static final float DISTANCE_BETWEEN_FLOOR_AND_CEILING = 225f;
     public static final float WIDTH = COLLISION_CIRCLE_RADIUS * 2;
 
+    private final Circle    mFloorCollisionCircle;
+    private final Rectangle mFloorCollisionRectangle;
 
-    private final Rectangle mCollisionRectangle;
-    private final Circle    mCollisionCircle;
+    private final Circle    mCeilingCollisionCircle;
+    private final Rectangle mCeilingCollisionRectangle;
 
     private float x = 0;
     private float y = 0;
 
     public Flower() {
-
         // Make the Flowers a random height
         this.y = MathUtils.random(HEIGHT_OFFSET);
 
-        // Initialise mCollisionRectangle
-        this.mCollisionRectangle = new Rectangle(x, y, COLLISION_RECTANGLE_WIDTH,
-                COLLISION_RECTANGLE_HEIGHT);
+        // Initialise the floor flowers
+        this.mFloorCollisionRectangle = new Rectangle(x, y,
+                COLLISION_RECTANGLE_WIDTH, COLLISION_RECTANGLE_HEIGHT);
 
-        // Initialise mCollisionCircle
-        this.mCollisionCircle = new Circle(x + mCollisionRectangle.width / 2,
-                y + mCollisionRectangle.height, COLLISION_CIRCLE_RADIUS);
+        this.mFloorCollisionCircle = new Circle(
+                x + mFloorCollisionRectangle.width / 2,
+                y + mFloorCollisionRectangle.height,
+                COLLISION_CIRCLE_RADIUS);
+
+        // Initialise the ceiling flowers
+        this.mCeilingCollisionRectangle = new Rectangle(
+                x, mFloorCollisionCircle.y + DISTANCE_BETWEEN_FLOOR_AND_CEILING,
+                COLLISION_RECTANGLE_WIDTH, COLLISION_RECTANGLE_HEIGHT);
+
+        this.mCeilingCollisionCircle = new Circle(
+                x + mCeilingCollisionRectangle.width / 2,
+                mCeilingCollisionRectangle.y, COLLISION_CIRCLE_RADIUS);
     }
 
     // Make the flower scroll at MAX_SPEED_PER_SECOND * delta
@@ -45,12 +57,17 @@ public class Flower {
 
 
     public void updateCollisionCircle() {
-        mCollisionCircle.setX(x + mCollisionRectangle.width / 2);
-        mCollisionCircle.setY(y + mCollisionRectangle.height);
+        // Set the floor based Flowers
+        mFloorCollisionCircle.setX(x + mFloorCollisionRectangle.width / 2);
+        mFloorCollisionCircle.setY(y + mFloorCollisionRectangle.height);
+
+        // Set the ceiling based flowers
+        mCeilingCollisionCircle.setX(x + mCeilingCollisionRectangle.width / 2);
     }
 
     public void updateCollisionRectangle() {
-        mCollisionRectangle.setX(x);
+        mFloorCollisionRectangle.setX(x);
+        mCeilingCollisionRectangle.setX(x);
     }
 
 
@@ -61,10 +78,17 @@ public class Flower {
     }
 
     public void drawDebug(ShapeRenderer shapeRenderer) {
-        shapeRenderer.circle(mCollisionCircle.x, mCollisionCircle.y,
-                mCollisionCircle.radius);
-        shapeRenderer.rect(mCollisionRectangle.x, mCollisionRectangle.y,
-                mCollisionRectangle.width, mCollisionRectangle.height);
+        // Draw the floor based Flowers
+        shapeRenderer.circle(mFloorCollisionCircle.x, mFloorCollisionCircle.y,
+                mFloorCollisionCircle.radius);
+        shapeRenderer.rect(mFloorCollisionRectangle.x, mFloorCollisionRectangle.y,
+                mFloorCollisionRectangle.width, mFloorCollisionRectangle.height);
+
+        // Draw the ceiling based Flowers
+        shapeRenderer.circle(mCeilingCollisionCircle.x, mCeilingCollisionCircle.y,
+                mCeilingCollisionCircle.radius);
+        shapeRenderer.rect(mCeilingCollisionCircle.x, mCeilingCollisionCircle.y,
+                mCeilingCollisionRectangle.width, mCeilingCollisionRectangle.height);
     }
 
     public float getX() {
