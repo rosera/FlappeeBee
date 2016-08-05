@@ -26,6 +26,7 @@ public class GameScreen extends ScreenAdapter {
     private Camera          mCamera;
     private SpriteBatch     mSpriteBatch;
     private Flappee         mFlappee;
+    private Flower          mFlower;
 
     @Override
     public void show() {
@@ -42,14 +43,20 @@ public class GameScreen extends ScreenAdapter {
         // Initialise the Flappee object
         mFlappee = new Flappee();
         mFlappee.setPosition(WORLD_WIDTH / 4, WORLD_HEIGHT / 2);
+
+        // Initialise the Flow object
+        mFlower = new Flower();
+        mFlower.setPosition(0f);
     }
 
+    // Clear the screen
     private void clearScreen() {
         Gdx.gl.glClearColor(Color.BLACK.r, Color.BLACK.g,
                 Color.BLACK.b, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+    // Update the for each screen cycle
     private void update(float delta) {
         mFlappee.update();
 
@@ -61,6 +68,7 @@ public class GameScreen extends ScreenAdapter {
         blockFlappeeLevingTheWorld();
     }
 
+    // Output the screen
     @Override
     public void render(float delta) {
 //        super.render(delta);
@@ -79,6 +87,7 @@ public class GameScreen extends ScreenAdapter {
 
         mShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         mFlappee.drawDebug(mShapeRenderer);
+        mFlower.drawDebug(mShapeRenderer);
         mShapeRenderer.end();
 
         // Update the flappee bee object
@@ -86,6 +95,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
 
+    // Limit the viewport to the defined WORLD_HEIGHT
     private void blockFlappeeLevingTheWorld() {
         mFlappee.setPosition(mFlappee.getX(),
                 MathUtils.clamp(mFlappee.getY(), 0, WORLD_HEIGHT));
